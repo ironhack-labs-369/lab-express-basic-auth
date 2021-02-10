@@ -5,7 +5,6 @@ const router = express.Router();
 const loginCheck = () => {
     return (req, res, next) => {
         // if user is logged in proceed to the next step
-        //otherwise redirect to /login
         if (req.session.user) {
             next();
         } else {

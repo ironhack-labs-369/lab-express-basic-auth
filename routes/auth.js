@@ -63,7 +63,6 @@ router.post('/signup', (req, res) => {
                     password: hash,
                 }).then((user) => {
                     console.log(user);
-                    // redirect to login (not there yet)
                     res.redirect('/private');
                 });
             }

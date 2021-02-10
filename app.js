@@ -9,18 +9,39 @@ const logger = require('morgan');
 const path = require('path');
 
 const app_name = require('./package.json').name;
-const debug = require('debug')(`${app_name}:${path.basename(__filename).split('.')[0]}`);
+const debug = require('debug')(
+    `${app_name}:${path.basename(__filename).split('.')[0]}`
+);
 
 const app = express();
 
 // require database configuration
 require('./configs/db.config');
 
+// session config
+const session = require('express-session');
+
+// session store using Mongo
+const mongoStore = require('connect-mongo')(session);
+
 // Middleware Setup
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+//  cookie
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        cookie: { maxAge: 1000 * 60 * 60 * 24 },
+        resave: true, // session forced to be saved back to the session store, even if session has not been modified
+        saveUninitialized: false,
+        store: new mongoStore({
+            mongooseConnection: mongoose.connection,
+        }),
+    })
+);
 
 // Express View engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,5 +54,8 @@ app.locals.title = 'Express - Generated with IronGenerator';
 
 const index = require('./routes/index.routes');
 app.use('/', index);
+
+const auth = require('./routes/auth');
+app.use('/', auth);
 
 module.exports = app;

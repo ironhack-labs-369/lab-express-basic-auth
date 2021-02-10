@@ -6,6 +6,32 @@ const bcrypt = require('bcrypt');
 router.get('/signup', (req, res, next) => {
     res.render('signup');
 });
+
+// Log in
+router.get('/login', (req, res) => {
+    res.render('login');
+});
+router.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    // check if username matches
+    User.findOne({ username: username }).then((userDB) => {
+        if (userDB === null) {
+            res.render('login', { message: 'Invalid credentials' });
+            return;
+        }
+        // if username exists I check the password
+        if (bcrypt.compareSync(password, userDB.password)) {
+            // password & hash match!!
+            req.session.user = userDB;
+            res.redirect('/profile');
+        } else {
+            res.render('login', {
+                message: 'Invalid credentials',
+            });
+        }
+    });
+});
+
 // sign up form posts to this route
 router.post('/signup', (req, res) => {
     const { username, password } = req.body;
@@ -38,13 +64,23 @@ router.post('/signup', (req, res) => {
                 }).then((user) => {
                     console.log(user);
                     // redirect to login (not there yet)
-                    res.redirect('/');
+                    res.redirect('/profile');
                 });
             }
         })
         .catch((err) => {
             console.log(err);
         });
+});
+
+router.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect('/');
+        }
+    });
 });
 
 module.exports = router;

@@ -17,8 +17,12 @@ const loginCheck = () => {
 // home page
 router.get('/', (req, res, next) => res.render('index'));
 
-// protected routed
-router.get('/profile', loginCheck(), (req, res) => {
+// protected routes
+
+router.get('/main', loginCheck(), (req, res) => {
+    res.redirect('/');
+});
+router.get('/private', loginCheck(), (req, res) => {
     res.render('profile', req.session.user);
 });
 

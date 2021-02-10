@@ -23,7 +23,7 @@ router.post('/login', (req, res) => {
         if (bcrypt.compareSync(password, userDB.password)) {
             // password & hash match!!
             req.session.user = userDB;
-            res.redirect('/profile');
+            res.redirect('/private');
         } else {
             res.render('login', {
                 message: 'Invalid credentials',
@@ -64,7 +64,7 @@ router.post('/signup', (req, res) => {
                 }).then((user) => {
                     console.log(user);
                     // redirect to login (not there yet)
-                    res.redirect('/profile');
+                    res.redirect('/private');
                 });
             }
         })
